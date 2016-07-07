@@ -74,12 +74,15 @@ window.onload = function() {
   var bulletCount = 0;
   console.log(bulletList);
 
-  setInterval(function() {
+  var main_interval = setInterval(function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     //context.drawImage(img,10,10);
     context.fillStyle = "red";
     //context.fillRect(main_character.x, main_character.y, 40, 40);
     context.drawImage(img[0],main_character.x, main_character.y, 40, 40);
+    if (main_character.x >= main_character.bx - 20 && main_character.bx <= main_character.x + 20  && main_character.y >= main_character.by - 16 && main_character.y <= main_character.by + 16) {
+      clearInterval(main_interval)
+    }
 
 
     for (var i = 0; i < bulletList.length; i++) {
