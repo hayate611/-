@@ -1,33 +1,29 @@
 window.onload = function() {
-  var img = new Image();
+  var img = [new Image(),new Image()];
   var canvas = document.getElementById("canvas");
-
-  console.log(img);
-  img.onload = function onImageLoad() {
-    img.src = 'IMG_1342.PNG';
-
-  }
   var context = canvas.getContext('2d');
-
-  function draw() {
+  var main_character = {
+    x : 170,
+    y : 300,
+    age : 0
+  }
+  img[0].src = './body.png';
+  img[1].src = './tama1.png';
+  img.onload = function () {
+    //context.drawImage(img,this.x,this.y);
+    console.log(img.src);
+  };
+  /*function draw() {
     var canvas = document.getElementById('SimpleCanvas');
     context.drawImage(img, 128, 40);
 
     if (!canvas || !canvas.getContext) {
       return false;
     }
-  }
+  }*/
 
-
-  var context = canvas.getContext("2d");
-  //var context2 = canvas.getContext("2d");
-  var x = 30, y = 300;
-  var bx = x;
-  var by = y;
-  var age = 0;
-/*  var ctx = canvas.getContext('2d');
-  var img = new Image();*/
-
+  main_character.bx = main_character.x;
+  main_character.by = main_character.y;
   var arrows = {
     left: false,
     up: false,
@@ -37,35 +33,39 @@ window.onload = function() {
   }
 
   var color = ["red", "blue", "green", "yellow"];
-  /*img.onload = function() {
-    　　　ctx.drawImage(img, x, y);
-  　　　}*/
-  function Bullet(){
-    this.width = 5;
-    this.height = 5;
-    this.init();
-  }
 
-  Bullet.prototype.init = function(){
-    this.visble = false;
-  }
-  Bullet.prototype.shot = function(){
-      this.x = x;
-      this.y = y;
+  class Bullet {
+    constructor() {
+      this.width = 15;
+      this.height = 15;
+      this.init();
+    }
+
+    init() {
+      this.visble = false;
+    }
+
+    shot() {
+      this.x = main_character.x;
+      this.y = main_character.y;
       this.visble = true;
       this.color = color[bulletCount % 4];
-  };
-  Bullet.prototype.draw = function(){
-    context.fillStyle = this.color;
-    context.fillRect(this.x + 2.5, this.y + 2.5, this.width, this.height);
-  };
-  Bullet.prototype.enterframe = function(){
+    }
+
+    draw() {
+      context.fillStyle = this.color;
+      context.drawImage(img[1],this.x + 14.5,this.y,this.width, this.height);
+
+    }
+
+    enterframe() {
       this.y -= 10;
       this.draw();
       if(this.x < 0){
         this.init();
       }
-  };
+    }
+  }
 
   var bulletList = new Array(30);
   for (var i = 0; i < bulletList.length; i++) {
@@ -76,9 +76,10 @@ window.onload = function() {
 
   setInterval(function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    //context.fillStyle = "#48D1CC"
+    //context.drawImage(img,10,10);
     context.fillStyle = "red";
-    context.fillRect(x, y, 10, 10);
+    //context.fillRect(main_character.x, main_character.y, 40, 40);
+    context.drawImage(img[0],main_character.x, main_character.y, 40, 40);
 
 
     for (var i = 0; i < bulletList.length; i++) {
@@ -88,19 +89,19 @@ window.onload = function() {
     }
 
 
-      if(arrows.triger && age % 3 === 0){
+      if(arrows.triger && main_character.age % 3 === 0){
           bulletList[bulletCount].shot();
-          bulletCount ++;
+          bulletCount++;
           if (bulletCount === bulletList.length - 1) {
             bulletCount = 0;
           }
       }
-      if(arrows.right && x < canvas.width - 20){ x += 5 }
-      if(arrows.up && y > 0){ y -= 5 }
-      if(arrows.left && x > 0){ x -= 5}
-      if(arrows.down && y < canvas.height - 20){ y += 5 }
+      if(arrows.right && main_character.x < canvas.width - 40){ main_character.x += 5 }
+      if(arrows.up && main_character.y > 0){ main_character.y -= 5 }
+      if(arrows.left && main_character.x > 0){ main_character.x -= 5}
+      if(arrows.down && main_character.y < canvas.height - 40){ main_character.y += 5 }
 
-      age++;
+      main_character.age++;
   }, 1000 / 30);
 
 
@@ -110,19 +111,24 @@ window.onload = function() {
   document.body.addEventListener("keydown", function(event) {
     switch (event.keyCode) {
       case 37:
-      arrows.left = true;
+        arrows.left = true;
       break;
+
       case 38:
-      arrows.up = true;
+        arrows.up = true;
       break;
+
       case 39:
-      arrows.right = true;
+        arrows.right = true;
       break;
+
       case 40:
-      arrows.down = true;
+        arrows.down = true;
       break;
+
       case 90:
-      arrows.triger = true;
+        arrows.triger = true;
+      break;
     }
 
   })
@@ -130,27 +136,19 @@ window.onload = function() {
   document.body.addEventListener("keyup", function(event) {
     switch (event.keyCode) {
       case 37:
-      arrows.left = false;
+        arrows.left = false;
       break;
       case 38:
-      arrows.up = false;
+        arrows.up = false;
       break;
       case 39:
-      arrows.right = false;
+        arrows.right = false;
       break;
       case 40:
-      arrows.down = false;
+        arrows.down = false;
       break;
       case 90:
-      arrows.triger = false;
+        arrows.triger = false;
     }
   })
- }
-
-
-
-  // document.body.addEventListener("keydown", function(event) {
-  //   context.fillStyle = "red";
-  //   context.fillRect(bx, by, 5, 5);
-  // });
-//document.body.addEventListener("keyup", function(event) {
+}
