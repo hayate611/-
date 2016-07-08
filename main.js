@@ -1,11 +1,12 @@
 $(function () {
+
   var img = [new Image(),new Image(),new Image()];
   img[0].src = 'data/body.png';
   img[1].src = 'data/tama1.png';
   img[2].src = 'data/teki2.png';
   const canvas = document.getElementById("canvas");
   const context = canvas.getContext('2d');
-  const fps = 30;
+  var fps = 30;
   var main_character = {
     x : 170,
     y : 300,
@@ -16,7 +17,8 @@ $(function () {
       right: false,
       left: false,
       triger: false
-    }
+    },
+    size : [50,31]
   }
 
   main_character.bx = main_character.x;
@@ -40,9 +42,7 @@ $(function () {
     }
 
     draw() {
-      context.fillStyle = this.color;
-      context.drawImage(img[1],this.x + 14.5,this.y,this.width, this.height);
-
+      context.drawImage(img[1],this.x + 17.5,this.y,this.width, this.height);
     }
 
     enterframe() {
@@ -61,17 +61,22 @@ $(function () {
       this.img = img_name;
       this.size = [20,20];
       this.move_age = 0;
+      this.mhp = 20;
+      this.hp = 20;
     }
 
     display() {
-      context.drawImage(this.img,this.x, this.y, this.size[0], this.size[1]);
+      if (this.hp > 0){
+        context.drawImage(this.img,this.x, this.y, this.size[0], this.size[1]);
+      }else {
+        enemy = new Enemy (100,20,img[2]);
+      }
     }
 
     move(x_move, y_move) {
       this.move_age++;
       this.x -= x_move;
       this.y -= y_move;
-      context.drawImage(this.img, this.x , this.y, this.size[0], this.size[1]);
     }
 
   }
@@ -82,17 +87,26 @@ $(function () {
     bulletList[i] = new Bullet();
   }
   var bulletCount = 0;
-
   var main_interval = setInterval(function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(img[0],main_character.x, main_character.y, 40, 40);
-    
-    if (main_character.x >= main_character.bx - 20 && main_character.bx <= main_character.x + 20  && main_character.y >= main_character.by - 16 && main_character.y <= main_character.by + 16) {
-      clearInterval(main_interval)
-    }
+    context.drawImage(img[0],main_character.x, main_character.y, main_character.size[0], main_character.size[1]);
 
-    enemy.display();
-    enemy.move(0,-2)
+    // if (main_character.x >= main_character.bx - 20 && main_character.bx <= main_character.x + 20  && main_character.y >= main_character.by - 16 && main_character.y <= main_character.by + 16) {
+    //   clearInterval(main_interval)
+    // }
+    if (enemy !== 0){
+      enemy.move(0,-2);
+      enemy.display();
+
+      for (var i = 0; i < bulletList.length; i++){
+        if ((bulletList[i].x <= enemy.x && bulletList[i].x + bulletList[i].width >= enemy.x) || (bulletList[i].x <= enemy.x - enemy.size[0] && bulletList[i].x + bulletList[i].width >= enemy.x - enemy.size[0])){
+          if ((bulletList[i].y <= enemy.y && bulletList[i].y + bulletList[i].height >= enemy.y) || (bulletList[i].y <= enemy.y + enemy.size[1] && bulletList[i].y + bulletList[i].height >= enemy.y + enemy.size[1])){
+            bulletList[i] = new Bullet();
+            enemy.hp -= 1;
+          };
+        };
+      }
+    }
 
     for (var i = 0; i < bulletList.length; i++) {
       if(bulletList[i].visble){
@@ -108,10 +122,11 @@ $(function () {
             bulletCount = 0;
           }
       }
-      if(main_character.key.right && main_character.x < canvas.width - 40){ main_character.x += 5 }
+
+      if(main_character.key.right && main_character.x < canvas.width - main_character.size[0]){ main_character.x += 5 }
       if(main_character.key.up && main_character.y > 0){ main_character.y -= 5 }
       if(main_character.key.left && main_character.x > 0){ main_character.x -= 5}
-      if(main_character.key.down && main_character.y < canvas.height - 40){ main_character.y += 5 }
+      if(main_character.key.down && main_character.y < canvas.height - main_character.size[1]){ main_character.y += 5 }
 
       main_character.age++;
   }, 1000 / fps);
