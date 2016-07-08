@@ -1,5 +1,5 @@
 window.onload = function() {
-  var img = [new Image(),new Image()];
+  var img = [new Image(),new Image(),new Image()];
   var canvas = document.getElementById("canvas");
   var context = canvas.getContext('2d');
   var main_character = {
@@ -9,6 +9,7 @@ window.onload = function() {
   }
   img[0].src = './body.png';
   img[1].src = './tama1.png';
+  img[2].src = './teki2.png';
   img.onload = function () {
     //context.drawImage(img,this.x,this.y);
     console.log(img.src);
@@ -67,6 +68,29 @@ window.onload = function() {
     }
   }
 
+  class Enemy {
+    constructor(x, y, img_name) {
+      this.x = x;
+      this.y = y;
+      this.img = img_name;
+      this.size = [20,20];
+      this.move_age = 0;
+    }
+
+    display() {
+      context.drawImage(this.img,this.x, this.y, this.size[0], this.size[1]);
+    }
+
+    move(x_move, y_move) {
+      this.move_age++;
+      this.x -= x_move;
+      this.y -= y_move;
+      context.drawImage(this.img, this.x , this.y, this.size[0], this.size[1])
+    }
+
+  }
+
+  var enemy = new Enemy (100,20,img[2]);
   var bulletList = new Array(30);
   for (var i = 0; i < bulletList.length; i++) {
     bulletList[i] = new Bullet();
@@ -74,13 +98,14 @@ window.onload = function() {
   var bulletCount = 0;
   console.log(bulletList);
 
-  setInterval(function() {
+  var main_interval = setInterval(function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     //context.drawImage(img,10,10);
     context.fillStyle = "red";
     //context.fillRect(main_character.x, main_character.y, 40, 40);
     context.drawImage(img[0],main_character.x, main_character.y, 40, 40);
-
+    enemy.display();
+    enemy.move(0,-1)
 
     for (var i = 0; i < bulletList.length; i++) {
       if(bulletList[i].visble){
@@ -103,8 +128,6 @@ window.onload = function() {
 
       main_character.age++;
   }, 1000 / 30);
-
-
 
 
 
