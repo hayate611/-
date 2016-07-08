@@ -1,39 +1,26 @@
-window.onload = function() {
+$(function () {
   var img = [new Image(),new Image(),new Image()];
-  var canvas = document.getElementById("canvas");
-  var context = canvas.getContext('2d');
+  img[0].src = 'data/body.png';
+  img[1].src = 'data/tama1.png';
+  img[2].src = 'data/teki2.png';
+  const canvas = document.getElementById("canvas");
+  const context = canvas.getContext('2d');
+  const fps = 30;
   var main_character = {
     x : 170,
     y : 300,
-    age : 0
-  }
-  img[0].src = './body.png';
-  img[1].src = './tama1.png';
-  img[2].src = './teki2.png';
-  img.onload = function () {
-    //context.drawImage(img,this.x,this.y);
-    console.log(img.src);
-  };
-  /*function draw() {
-    var canvas = document.getElementById('SimpleCanvas');
-    context.drawImage(img, 128, 40);
-
-    if (!canvas || !canvas.getContext) {
-      return false;
+    age : 0,
+    key : {
+      left: false,
+      up: false,
+      right: false,
+      left: false,
+      triger: false
     }
-  }*/
+  }
 
   main_character.bx = main_character.x;
   main_character.by = main_character.y;
-  var arrows = {
-    left: false,
-    up: false,
-    right: false,
-    left: false,
-    triger: false
-  }
-
-  var color = ["red", "blue", "green", "yellow"];
 
   class Bullet {
     constructor() {
@@ -50,7 +37,6 @@ window.onload = function() {
       this.x = main_character.x;
       this.y = main_character.y;
       this.visble = true;
-      this.color = color[bulletCount % 4];
     }
 
     draw() {
@@ -85,7 +71,7 @@ window.onload = function() {
       this.move_age++;
       this.x -= x_move;
       this.y -= y_move;
-      context.drawImage(this.img, this.x , this.y, this.size[0], this.size[1])
+      context.drawImage(this.img, this.x , this.y, this.size[0], this.size[1]);
     }
 
   }
@@ -96,16 +82,17 @@ window.onload = function() {
     bulletList[i] = new Bullet();
   }
   var bulletCount = 0;
-  console.log(bulletList);
 
   var main_interval = setInterval(function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    //context.drawImage(img,10,10);
-    context.fillStyle = "red";
-    //context.fillRect(main_character.x, main_character.y, 40, 40);
     context.drawImage(img[0],main_character.x, main_character.y, 40, 40);
+    
+    if (main_character.x >= main_character.bx - 20 && main_character.bx <= main_character.x + 20  && main_character.y >= main_character.by - 16 && main_character.y <= main_character.by + 16) {
+      clearInterval(main_interval)
+    }
+
     enemy.display();
-    enemy.move(0,-1)
+    enemy.move(0,-2)
 
     for (var i = 0; i < bulletList.length; i++) {
       if(bulletList[i].visble){
@@ -114,64 +101,70 @@ window.onload = function() {
     }
 
 
-      if(arrows.triger && main_character.age % 3 === 0){
+      if(main_character.key.triger && main_character.age % 3 === 0){
           bulletList[bulletCount].shot();
           bulletCount++;
           if (bulletCount === bulletList.length - 1) {
             bulletCount = 0;
           }
       }
-      if(arrows.right && main_character.x < canvas.width - 40){ main_character.x += 5 }
-      if(arrows.up && main_character.y > 0){ main_character.y -= 5 }
-      if(arrows.left && main_character.x > 0){ main_character.x -= 5}
-      if(arrows.down && main_character.y < canvas.height - 40){ main_character.y += 5 }
+      if(main_character.key.right && main_character.x < canvas.width - 40){ main_character.x += 5 }
+      if(main_character.key.up && main_character.y > 0){ main_character.y -= 5 }
+      if(main_character.key.left && main_character.x > 0){ main_character.x -= 5}
+      if(main_character.key.down && main_character.y < canvas.height - 40){ main_character.y += 5 }
 
       main_character.age++;
-  }, 1000 / 30);
+  }, 1000 / fps);
 
 
 
-  document.body.addEventListener("keydown", function(event) {
+  $(window).keydown(function(event) {
     switch (event.keyCode) {
       case 37:
-        arrows.left = true;
+        main_character.key.left = true;
       break;
 
       case 38:
-        arrows.up = true;
+        main_character.key.up = true;
       break;
 
       case 39:
-        arrows.right = true;
+        main_character.key.right = true;
       break;
 
       case 40:
-        arrows.down = true;
+        main_character.key.down = true;
       break;
 
       case 90:
-        arrows.triger = true;
+        main_character.key.triger = true;
       break;
     }
 
   })
 
-  document.body.addEventListener("keyup", function(event) {
+$(window).keyup(function(event) {
     switch (event.keyCode) {
       case 37:
-        arrows.left = false;
+        main_character.key.left = false;
       break;
+
       case 38:
-        arrows.up = false;
+        main_character.key.up = false;
       break;
+
       case 39:
-        arrows.right = false;
+        main_character.key.right = false;
       break;
+
       case 40:
-        arrows.down = false;
+        main_character.key.down = false;
       break;
+
       case 90:
-        arrows.triger = false;
+        main_character.key.triger = false;
+      break;
     }
   })
-}
+
+})
