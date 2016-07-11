@@ -24,8 +24,6 @@ $(function () {
       this.img.main.src = 'data/body.png';
       this.img.enemy[0].src = 'data/teki2.png';
       this.img.shot[0].src = 'data/tama1.png';
-
-      enemy = new Enemy (100,20,this.img.enemy[0]);
       bulletList = new Array(30);
       main_character = new Main_character ();
       for (var i = 0; i < bulletList.length; i++) {
@@ -62,74 +60,100 @@ $(function () {
           }
       }
 
-      enemy.move(0,-2);
-      enemy.display();
-      for (var i = 0; i < bulletList.length; i++){
-        if ((bulletList[i].x <= enemy.x && bulletList[i].x + bulletList[i].width >= enemy.x) || (bulletList[i].x <= enemy.x - enemy.size[0] && bulletList[i].x + bulletList[i].width >= enemy.x - enemy.size[0])){
-          if ((bulletList[i].y <= enemy.y && bulletList[i].y + bulletList[i].height >= enemy.y) || (bulletList[i].y <= enemy.y + enemy.size[1] && bulletList[i].y + bulletList[i].height >= enemy.y + enemy.size[1])){
-            bulletList[i] = new Bullet();
-            enemy.hp -= 1;
+      if (enemy !== []){
+        for (var i = 0; i < enemy.length; i++){
+          enemy[i].move(0,-2);
+          enemy[i].display();
+        }
+        for (var i = 0; i < bulletList.length; i++){
+          for (var j = 0; j < enemy.length; j++){
+            if ((bulletList[i].x <= enemy[j].x && bulletList[i].x + bulletList[i].width >= enemy[j].x) || (bulletList[i].x <= enemy[j].x - enemy[j].size[0] && bulletList[i].x + bulletList[i].width >= enemy[j].x - enemy[j].size[0])){
+              if ((bulletList[i].y <= enemy[j].y && bulletList[i].y + bulletList[i].height >= enemy[j].y) || (bulletList[i].y <= enemy[j].y + enemy[j].size[1] && bulletList[i].y + bulletList[i].height >= enemy[j].y + enemy[j].size[1])){
+                bulletList[i] = new Bullet();
+                enemy[j].hp -= 1;
+              }
+            }
           }
         }
       }
 
-      if(main_character.key.right && main_character.x < canvas.width - main_character.size[0]){ main_character.x += main_character.speed }
-      if(main_character.key.up && main_character.y > 0){ main_character.y -= main_character.speed }
-      if(main_character.key.left && main_character.x > 0){ main_character.x -= main_character.speed}
-      if(main_character.key.down && main_character.y < canvas.height - main_character.size[1]){ main_character.y += main_character.speed }
-
-      $(window).keydown(function(event) {
-        switch (event.keyCode) {
-          case 37:
-            main_character.key.left = true;
-          break;
-
-          case 38:
-            main_character.key.up = true;
-          break;
-
-          case 39:
-            main_character.key.right = true;
-          break;
-
-          case 40:
-            main_character.key.down = true;
-          break;
-
-          case 90:
-            main_character.key.triger = true;
-          break;
-        }
-
-      })
-
-    $(window).keyup(function(event) {
-        switch (event.keyCode) {
-          case 37:
-            main_character.key.left = false;
-          break;
-
-          case 38:
-            main_character.key.up = false;
-          break;
-
-          case 39:
-            main_character.key.right = false;
-          break;
-
-          case 40:
-            main_character.key.down = false;
-          break;
-
-          case 90:
-            main_character.key.triger = false;
-          break;
-        }
-      })
-
       main_character.age++;
+      main_game.enemy_assignment();
     }
 
+    move() {
+
+            if(main_character.key.right && main_character.x < canvas.width - main_character.size[0]){ main_character.x += main_character.speed }
+            if(main_character.key.up && main_character.y > 0){ main_character.y -= main_character.speed }
+            if(main_character.key.left && main_character.x > 0){ main_character.x -= main_character.speed}
+            if(main_character.key.down && main_character.y < canvas.height - main_character.size[1]){ main_character.y += main_character.speed }
+
+            $(window).keydown(function(event) {
+              switch (event.keyCode) {
+                case 37:
+                  main_character.key.left = true;
+                break;
+
+                case 38:
+                  main_character.key.up = true;
+                break;
+
+                case 39:
+                  main_character.key.right = true;
+                break;
+
+                case 40:
+                  main_character.key.down = true;
+                break;
+
+                case 90:
+                  main_character.key.triger = true;
+                break;
+              }
+
+            })
+
+          $(window).keyup(function(event) {
+              switch (event.keyCode) {
+                case 37:
+                  main_character.key.left = false;
+                break;
+
+                case 38:
+                  main_character.key.up = false;
+                break;
+
+                case 39:
+                  main_character.key.right = false;
+                break;
+
+                case 40:
+                  main_character.key.down = false;
+                break;
+
+                case 90:
+                  main_character.key.triger = false;
+                break;
+              }
+            })
+    }
+
+    enemy_assignment() {
+      for (var i = 0; i < enemy.length; i++){
+        if (enemy[i].y >= 640){
+          enemy.splice(i,1);
+        }else if (enemy[i].x >= 401){
+          enemy.splice(i,1);
+        }
+      }
+
+      if (main_character.age == 10){
+        enemy.push(new Enemy(20,0,main_data.img.enemy[0]));
+      }else if (main_character.age == 100){
+        enemy.push(new Enemy(30,0,main_data.img.enemy[0]));
+        enemy.push(new Enemy(100,0,main_data.img.enemy[0]));
+      }
+    }
   }
 
 /*============================================================================//
@@ -201,24 +225,25 @@ $(function () {
       this.x = x;
       this.y = y;
       this.img = img_name;
-      this.size = [20,20];
+      this.size = [img_name.width-20,img_name.height-20];
       this.move_age = 0;
       this.mhp = 20;
       this.hp = 20;
+
     }
 
     display() {
       if (this.hp > 0){
         context.drawImage(this.img,this.x, this.y, this.size[0], this.size[1]);
-      }else {
-        enemy = new Enemy (100,20,this.img);
+      }else if (this.hp < 0){
+        this.y = 6000;
       }
     }
 
     move(x_move, y_move) {
       this.move_age++;
-      this.x -= x_move;
-      this.y -= y_move;
+      this.x; //+= Math.cos(this.move_age * 100) * 5; //x_move;
+      this.y += Math.sin(this.move_age * 100) * 5 - y_move;
     }
 
   }
@@ -227,12 +252,13 @@ $(function () {
 //----------------------------------------------------------------------------//
 //  ゲームを開始するための処理
 //============================================================================*/
-  var enemy, bulletList, main_character, bulletCount;
+  var enemy = [], bulletList, main_character, bulletCount, enemy_id;
   var main_data = new Main_data();
   var main_game = new Main_game();
 
   var main_interval = setInterval(function() {
     main_game.main();
+    main_game.move();
   }, 1000 / main_data.fps);
 
 })
